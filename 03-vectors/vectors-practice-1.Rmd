@@ -54,8 +54,13 @@ seq(2, 6.5, 1.5)
 \]
 
 ```{r problem3}
-rep(c(1,2,3), 3)
-rep()
+rep(1:3, times=3)
+rep(1:3, each=2)
+rep(1:3, times=c(2,1,2))
+rep(1:3, times=2, len=7)
+rep(rep(1:3, times=3), each=2)
+
+
 ```
 
 * * *
@@ -105,7 +110,13 @@ draw(p1x, p1y)
 you will see Calvin's buddy Hobbes, except that there is a problem with the data: 
 the points that are part of Hobbes on the right side have been mistakenly moved 
 up by 25 units. Please fix this problem, so that drawing `p1x` with `p1y` results 
-in a more plausible rendering of Hobbes. 
+in a more plausible rendering of Hobbes:
+
+
+```{r hobbesFixed}
+p1y[p1x>=50] <- p1y[p1x>=50]-25
+draw(p1x, p1y)
+```
 
 2.   Let's take a look at the second example:
 
@@ -118,6 +129,11 @@ right drawing has been shifted to the left. Please move that part of the drawing
 to the right, so that the four Calvins are symmetrically placed (the same distance 
 apart both horizontally and vertically).
 
+```{r calvinsFixed}
+p2x[p2x > 40 & p2y > 50] <- p2x[p2x > 40 & p2y > 50] + 15
+draw(p2x, p2y)
+```
+
 3.   Let's take a look at the third example:
 
 ```{r}
@@ -127,6 +143,13 @@ draw(p3x, p3y)
 here, we almost have four duplicates of Hobbes in several places, but every other 
 point has been moved five units up and to the right, making it almost impossible 
 to see Hobbes anywhere. Try to resolve the four duplicates of Hobbes.
+
+```{r hobbesesFixed}
+indices <- rep(c(T,F), len=1603)
+p3x[indices] <- p3x[indices] - 5
+p3y[indices] <- p3y[indices] - 5
+draw(p3x, p3y)
+```
 
 <div id="license">
 Adapted from material developed by Olaf Hall-Holt and Paul Roback for CS 125 at St. Olaf College.
