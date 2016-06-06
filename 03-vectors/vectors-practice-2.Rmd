@@ -1,6 +1,6 @@
 ---
 title: "Vectors: practice II"
-author: "R Workshop"
+author: "Lizzie Kumar"
 output:
   html_document:
     css: ../workshop.css
@@ -33,6 +33,20 @@ that showcases which ones have the best `mpg`, then, the ones that have the
 highest `hp`.  Using `order()`, rearrange this data frame such that it's ordered
 first by `mpg` (low to high) and then by `hp` (high to low).
 
+```{r mtcarsort}
+# sort first by hp
+hpIndices <- order(mtcars$hp)
+mtcars.new <- mtcars
+mtcars.new <- mtcars.new[hpIndices,]
+
+# now sort by mpg, tiebreakers arranged by hp
+mpgIndices <- order(mtcars.new$mpg)
+mtcars.new <- mtcars.new[mpgIndices,]
+
+mtcars.new
+```
+
+
 * * *
 
 ## Changing Vector Elements
@@ -62,6 +76,11 @@ draw(p1x, p1y)
 
 you will see Calvin and his mirror reflection, except that there is a problem with the data: some garbage points are mixed in with the correct data, resulting in a lot of spikes that reach reach between 75 and 100 in the y direction. Please fix this problem, so that drawing `p1x` with `p1y` results in a clean rendering of Calvin and his reflection.
 
+```{r fixcalvin}
+garbageIndices = which(p1y>75 & p1y <100)
+draw(p1x[-garbageIndices], p1y[-garbageIndices])
+```
+
 1.   
 
 Let's take a look at the second example:
@@ -71,6 +90,15 @@ draw(p2x, p2y)
 ```
 
 here, we almost have four duplicates of Hobbes in a square configuration, but the upper right drawing is missing. Please duplicate one of the drawings of Hobbes, and place it in the upper right corner (by modifying the `p2x` and `p2y` vectors, that is).
+
+```{r fourthHobbes}
+# this is wrong
+x.indices <- which(p2x > 50)
+y.indices <- which(p2y > 50)
+
+draw(p2x[x.indices], p2y[y.indices])
+
+```
 
 1.   
 
