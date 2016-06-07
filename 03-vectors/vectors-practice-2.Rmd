@@ -92,6 +92,7 @@ draw(p2x, p2y)
 here, we almost have four duplicates of Hobbes in a square configuration, but the upper right drawing is missing. Please duplicate one of the drawings of Hobbes, and place it in the upper right corner (by modifying the `p2x` and `p2y` vectors, that is).
 
 ```{r fourthHobbes}
+# select top left hobbes
 hobbes.indices <- which(p2y > 50)
 
 p2x.new <- c(p2x, p2x[hobbes.indices]+50)
@@ -112,6 +113,7 @@ here, Calvin is running around a circle, but the drawing closest to the origin i
 
 
 ```{r flipCalvin}
+# found the final calvin with guess and check
 calvin.indices <- 1315:1577
 
 p3x.new <- c(p3x[-calvin.indices], p3y[calvin.indices])
