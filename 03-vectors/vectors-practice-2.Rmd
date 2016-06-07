@@ -92,12 +92,12 @@ draw(p2x, p2y)
 here, we almost have four duplicates of Hobbes in a square configuration, but the upper right drawing is missing. Please duplicate one of the drawings of Hobbes, and place it in the upper right corner (by modifying the `p2x` and `p2y` vectors, that is).
 
 ```{r fourthHobbes}
-# this is wrong
-x.indices <- which(p2x > 50)
-y.indices <- which(p2y > 50)
+hobbes.indices <- which(p2y > 50)
 
-draw(p2x[x.indices], p2y[y.indices])
+p2x.new <- c(p2x, p2x[hobbes.indices]+50)
+p2y.new <- c(p2y, p2y[hobbes.indices])
 
+draw(p2x.new, p2y.new)
 ```
 
 1.   
@@ -109,6 +109,16 @@ draw(p3x, p3y)
 ```
 
 here, Calvin is running around a circle, but the drawing closest to the origin is backwards. In particular, the x and y coordinates need to be flipped to restore symmetry. As before, please fix this problem.
+
+
+```{r flipCalvin}
+calvin.indices <- 1315:1577
+
+p3x.new <- c(p3x[-calvin.indices], p3y[calvin.indices])
+p3y.new <- c(p3y[-calvin.indices], p3x[calvin.indices])
+
+draw(p3x.new, p3y.new)
+```
 
 
 <div id="license">
