@@ -17,14 +17,46 @@ opts_chunk$set(warning=FALSE, message=FALSE)
 
 ### Earthquake data
 
-```{r load-quakes, eval = FALSE}
+```{r load-quakes, echo=FALSE}
 data(quakes)
+require(dplyr)
 ```
 
 1.   Show a command you could use to find the average (mean) magnitude of all earthquakes that occurred below the median depth of all earthquakes.
+
+```{r}
+quakes %>%
+  filter(depth > median(quakes$depth)) %>%
+  summarize(mean(mag))
+```
+
+
 1.   How does the average magnitude of these "deep" earthquakes compare to the magnitude of "shallow" (above median depth) earthquakes?
+
+```{r}
+quakes %>%
+  filter(depth < median(quakes$depth)) %>%
+  summarize(mean(mag))
+```
+
+
 1.   Show the command you would use to get the row(s) with the smallest value in the `depth` column.
+
+```{r}
+quakes %>%
+  filter(depth == min(quakes$depth))
+```
+
+
 1.   Show the command you would use to create a new data frame named `quakes_sorted` that stores the data in sorted order by `depth`.
+
+```{r}
+quakes_sorted <- quakes %>%
+  arrange(depth)
+
+quakes_sorted
+```
+
 
 * * *
 
@@ -35,7 +67,50 @@ library(pnwflights14)
 data(flights)
 ```
 
-1. Say I fly very often between PDX airport in Portland and Logan Airport in Boston. Based on the 2013 data, which day of the week would you recommend that I buy a ticket for if I want to minimize delays?
+1. Say I fly very often between PDX airport in Portland and Logan Airport in Boston. Based on the 2014 data, which day of the week would you recommend that I buy a ticket for if I want to minimize delays?
+
+```{r}
+# days_of_week <- c("Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Monday", "Tuesday")
+# days_of_week_2014 <- rep(days_of_week, len=365)
+# 
+# flights_dow <- flights %>%
+#   
+# 
+# flights_doy <- flights %>%
+#   arrange(year, month, day) %>%
+#   group_by(year, month, day) %>%
+#   summarize(avg_delay = mean(dep_delay, na.rm = TRUE))
+# 
+# flights_doy$dow <- days_of_week_2014
+#   
+# flights_dow <- flights_doy %>%
+#   group_by(dow) %>%
+#   summarize(avg_delay = mean(avg_delay))
+# 
+# flights_dow$dow[which.min(flights_dow$avg_delay)]
+
+get_day_of_week <- function(d, m, y) {
+  weekdays(as.Date(paste(d, "-", m, "-", y, sep = ""), '%d-%m-%Y'))
+}
+
+pdx_bos <- flights %>%
+  filter((origin == "PDX" & dest == "BOS") | (origin == "BOS" & dest == "PDX")) %>%
+  mutate(dow = get_day_of_week(day, month, year)) %>%
+  group_by(dow) %>%
+  summarize(avg_delay = mean(dep_delay, na.rm = TRUE), count = n())
+
+pdx_bos
+```
+
+```{r}
+
+flights_by_time <- flights %>%
+  mutate(scheduled = (dep_time - dep_delay) %% 2400 )
+
+plot(flights_by_time$scheduled, flights_by_time$dep_delay)
+
+```
+
 
 1. What advice do you have for the best airline for this route?
 
@@ -46,3 +121,25 @@ data(flights)
 
 Go back to the vector `tData` that you used for the project. Use this data and
 maybe `dplyr` to form a dataframe that will make the analysis much more straightforward.
+
+```{r}
+load(url('http://www.stolaf.edu/people/olaf/cs125/project1.RData'))
+```
+
+```{r}
+faren_data <- (tData/100 + 14)*1.8 + 32
+
+data_matrix <- matrix(data = faren_data, nrow = length(faren_data)/12, ncol = 12, byrow = TRUE)
+
+# Set column names
+colnames(data_matrix) <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+rownames(data_matrix) <- 1881:2012
+
+tdata.df <- as.data.frame(as.table(data_matrix), stringsAsFactors = FALSE)
+
+temp_data <- tdata.df %>%
+  transmute(Temperature = Freq, Month = as.factor(Var2), Year = as.numeric(Var1)) %>%
+  arrange(Year)
+```
+
+
