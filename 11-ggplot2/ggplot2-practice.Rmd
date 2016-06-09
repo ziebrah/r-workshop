@@ -41,19 +41,22 @@ fiji <- filter(world_map, region == "Fiji") %>%
 q3 <- quantile(quakes$mag, probs = seq(0, 1, .3333333333), na.rm = TRUE)
 
 quake_new <- quakes %>%
-  mutate(disc_mag = ifelse((mag > q3[1] & mag <q3[2]), "low",
-                           ifelse((mag > q3[2] & mag < q3[3]), "med",
+  mutate(disc_mag = ifelse((mag <= q3[2]), "low",
+                           ifelse((mag > q3[2] & mag <= q3[3]), "med",
                                   "high"))) %>%
   mutate(disc_mag = factor(disc_mag,
                            levels = c("low", "med", "high"))) %>%
   mutate(long_mod = long %% 360)
 
 ggplot() +
-  geom_point(data = quake_new, aes(x = long_mod, y = lat, color = depth)) +
+  geom_point(data = quake_new, aes(x = long_mod, y = lat, color = depth),
+             size = 1) +
   geom_polygon(data = fiji, aes(x = long_mod, y = lat, group=group,
                                 fill = region), show.legend = TRUE) +
   facet_wrap(~disc_mag) +
-  ggtitle("Low, Medium, and High Magnitude Earthquakes Around Fiji")
+  ggtitle("Low, Medium, and High Magnitude Earthquakes Around Fiji since 1964")
+
+summary(quake_new$disc_mag)
 
 ```
 
