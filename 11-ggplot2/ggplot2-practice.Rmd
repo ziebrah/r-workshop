@@ -1,5 +1,6 @@
 ---
 title: "ggplot2 Practice"
+author: "Lizzie Kumar and Em Beauchamp"
 output:
   html_document:
     css: ../workshop.css
@@ -21,6 +22,43 @@ haven't seen!) to reveal an interesting relationship.
 
 You will be presenting one of these plots to the group.
 
+
+```{r load, echo=FALSE, warning=FALSE, message=FALSE}
+data(quakes)
+require(pnwflights14)
+require(dplyr)
+require(ggplot2)
+require(mapdata)
+load(url('http://www.stolaf.edu/people/olaf/cs125/project1.RData'))
+```
+
+```{r plot, fig.width = 10}
+world_map <- map_data("world")
+fiji <- filter(world_map, region == "Fiji") %>%
+  mutate(long_mod = long %% 360)
+
+# calculate 3 quantiles for magnitude
+q3 <- quantile(quakes$mag, probs = seq(0, 1, .3333333333), na.rm = TRUE)
+
+quake_new <- quakes %>%
+  mutate(disc_mag = ifelse((mag > q3[1] & mag <q3[2]), "low",
+                           ifelse((mag > q3[2] & mag < q3[3]), "med",
+                                  "high"))) %>%
+  mutate(disc_mag = factor(disc_mag,
+                           levels = c("low", "med", "high"))) %>%
+  mutate(long_mod = long %% 360)
+
+ggplot() +
+  geom_point(data = quake_new, aes(x = long_mod, y = lat, color = depth)) +
+  geom_polygon(data = fiji, aes(x = long_mod, y = lat, group=group,
+                                fill = region), show.legend = TRUE) +
+  facet_wrap(~disc_mag) +
+  ggtitle("Low, Medium, and High Magnitude Earthquakes Around Fiji")
+
+```
+
+
+
 * * *
 
 ## Flights
@@ -38,6 +76,20 @@ distance of less than 2000 miles.
 <img src="ggplot.png" width = 500>
 </center>
 
+```{r fig.height=7, fig.width=11}
+flights %>%
+  select(tailnum, arr_delay, distance) %>%
+  group_by(tailnum) %>%
+  summarize(delay = mean(arr_delay, na.rm = TRUE),
+            dist = mean(distance, na.rm = TRUE),
+            count = n()) %>%
+  filter(count > 20, dist < 2000, tailnum != "") %>%
+  ggplot(aes(x = dist, y = delay)) +
+    geom_point(aes(size = count), alpha=0.5) +
+    geom_smooth()
+```
+
+
 1. There are two plots that show up 
 in the `dplyr` slides. How could these be improved to make them easier to read/interpret? Please implement these improvements.
 
@@ -48,4 +100,42 @@ in the `dplyr` slides. How could these be improved to make them easier to read/i
 Rebuild the plots that you generated according to exercises 4 and 9 using
 the dataframe you previously contructed, `dplyr`, and `ggplot2`. Recycle dataframes
 and plots whereever you can.
+
+```{r}
+faren_data <- (tData/100 + 14)*1.8 + 32
+
+data_matrix <- matrix(data = faren_data, nrow = length(faren_data)/12, ncol = 12, byrow = TRUE)
+
+# Set column names
+colnames(data_matrix) <- c("January", "February", "March", "April", "May",
+                           "June", "July", "August", "September", "October",
+                           "November", "December")
+rownames(data_matrix) <- 1881:2012
+
+tdata.df <- as.data.frame(as.table(data_matrix), stringsAsFactors = FALSE)
+
+temp_data <- tdata.df %>%
+  transmute(Temperature = Freq, Month = as.factor(Var2),
+            Year = as.numeric(Var1)) %>%
+  arrange(Year)
+```
+
+```{r plot1, fig.width = 9}
+ggplot(data = temp_data, aes(x = Year, y = Temperature)) +
+  facet_wrap(~ Month) +
+  geom_line() +
+  ggtitle("Average Temperature Over Time by Month")
+```
+
+```{r plot2}
+temp_data %>%
+  mutate(era = ifelse((Year %in% 1881:(1881+43)), 1,
+                      ifelse((Year %in% 1925: (1925 + 43) ), 2, 3))) %>%
+  ggplot(aes(x = Year, y = Temperature)) +
+  geom_line() +
+  facet_wrap(~era, scale = "free_x") +
+  ggtitle("Three Eras of Temperature Change")
+                        
+```
+
 
